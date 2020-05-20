@@ -7,7 +7,9 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.ram = [0] * 256
+        self.reg = [0] * 8
+        self.pc = 0
 
     def load(self):
         """Load a program into memory."""
@@ -39,6 +41,12 @@ class CPU:
         #elif op == "SUB": etc
         else:
             raise Exception("Unsupported ALU operation")
+    
+    def ram_read(self, mar):
+        return self.ram[mar]
+    
+    def ram_write(self, mdr, mar):
+        self.ram[mar] = mdr
 
     def trace(self):
         """
@@ -62,4 +70,10 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        LDI #a constant value
+        
+        #read the bytes at PC+1 and PC+2 from RAM and store into variables
+        operand_a = self.ram_read(self.pc + 1)
+        operand_b = self.ram_read(self.pc + 2)
+        
+    
