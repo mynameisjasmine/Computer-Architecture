@@ -51,10 +51,18 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        
         
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "CMP":
+            if self.reg[reg_a] == self.reg[reg_b]:
+                self.fl = self.fl | 1
+            elif self.reg[reg_a] > self.reg[reg_b]:
+                self.fl = self.fl | 2
+            elif self.reg[reg_a] < self.reg[reg_b]:
+                self.fl = self.fl | 4
+
 
         else:
             raise Exception("Unsupported ALU operation")
@@ -97,6 +105,10 @@ class CPU:
         POP = 0b01000110
         CALL = 0b01010000
         RET = 0b00010001
+        CMP = 0b10100111
+        JMP = 0b01010100
+        JEQ = 0b01010101
+        JNE = 0b01010110
 
 
          
@@ -178,7 +190,36 @@ class CPU:
                 # registers[self.sp] += 1
 
                 # #store it in the PC
-                # self.pc = return_add                              
+                # self.pc = return_add
+
+            elif ir == CMP:
+                self.alu("CMP", operand_a, operand_b)
+                self.pc += 3
+            
+            elif ir == JMP:
+                #decrement
+                self.reg[self.sp] -=1
+                self.ram[self.reg[self.sp]] = self.pc + 2
+                self.pc = self.reg[operand_a]
+
+            
+            elif ir == JEQ:
+                if self.fl == 1 or self.fl == 3 or self.fl == 5 or self.fl == 7:
+                    self.reg[self.sp] -=1
+                    self.ram[self.reg[self.sp]] = self.pc + 2
+                    self.pc = self.reg[operand_a]
+                else:
+                    self.pc += 2
+
+            
+            elif ir == JNE:
+                if self.fl == 0 or self.fl == 2 or self.fl == 3 or self.fl == 4:
+                    self.reg[self.sp] -= 1
+                    self.ram[self.reg[self.sp]] = self.pc + 2
+                    self.pc = self.reg[operand_a]
+                else:
+                    self.pc += 2
+
 
            
             
